@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'add_book_page.dart';
 import 'models/book_model.dart';
 import 'services/books_service.dart';
 
@@ -11,7 +12,6 @@ class BooksPage extends StatefulWidget {
 }
 
 class _BooksPageState extends State<BooksPage> {
-  static const Color primaryColor = Color(0xFF420F0F);
   static const Color cardColor = Color(0xFF6B302C);
   static const Color backgroundColor = Color(0xFFC89F7A);
 
@@ -44,12 +44,29 @@ class _BooksPageState extends State<BooksPage> {
         _books = books;
         _loading = false;
       });
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
 
       setState(() {
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _addBook() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AddBookPage(),
+      ),
+    );
+
+    if (result == true) {
+      setState(() {
+        _loading = true;
+      });
+
+      await _loadBooks();
     }
   }
 
@@ -81,10 +98,10 @@ class _BooksPageState extends State<BooksPage> {
       color: backgroundColor,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isMobile = constraints.maxWidth < 700;
+          final mobile = constraints.maxWidth < 700;
 
           return Padding(
-            padding: EdgeInsets.all(isMobile ? 16 : 24),
+            padding: EdgeInsets.all(mobile ? 16 : 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -96,8 +113,8 @@ class _BooksPageState extends State<BooksPage> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                _buildActions(isMobile),
-                const SizedBox(height: 20),
+                _buildActions(mobile),
+                const SizedBox(height: 18),
                 Text(
                   '${_filteredBooks.length} livros encontrados',
                   style: const TextStyle(
@@ -105,7 +122,7 @@ class _BooksPageState extends State<BooksPage> {
                     fontSize: 12,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Expanded(
                   child: _loading
                       ? const Center(
@@ -113,9 +130,9 @@ class _BooksPageState extends State<BooksPage> {
                             color: Colors.white,
                           ),
                         )
-                      : isMobile
-                          ? _buildMobileList()
-                          : _buildDesktopTable(),
+                      : mobile
+                          ? _buildMobile()
+                          : _buildDesktop(),
                 ),
               ],
             ),
@@ -125,33 +142,55 @@ class _BooksPageState extends State<BooksPage> {
     );
   }
 
-  Widget _buildActions(bool isMobile) {
-    if (isMobile) {
+  Widget _buildActions(bool mobile) {
+    final search = Expanded(
+      child: TextField(
+        controller: _searchController,
+        onChanged: (_) => setState(() {}),
+        decoration: const InputDecoration(
+          hintText: 'Procurar por nome do livro...',
+          prefixIcon: Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+
+    final filter = ElevatedButton.icon(
+      onPressed: () {},
+      icon: const Icon(Icons.filter_alt),
+      label: const Text('FILTRO'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        minimumSize: const Size(0, 44),
+      ),
+    );
+
+    final add = ElevatedButton.icon(
+      onPressed: _addBook,
+      icon: const Icon(Icons.add),
+      label: const Text('ADICIONAR'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: cardColor,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(0, 44),
+      ),
+    );
+
+    if (mobile) {
       return Column(
         children: [
-          TextField(
-            controller: _searchController,
-            onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              hintText: 'Procurar por nome do livro...',
-              prefixIcon: Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
+          search,
+          const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(
-                child: _buildFilterButton(),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildAddButton(),
-              ),
+              Expanded(child: filter),
+              const SizedBox(width: 8),
+              Expanded(child: add),
             ],
           ),
         ],
@@ -160,80 +199,100 @@ class _BooksPageState extends State<BooksPage> {
 
     return Row(
       children: [
-        Expanded(
-          child: TextField(
-            controller: _searchController,
-            onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              hintText: 'Procurar por nome do livro...',
-              prefixIcon: Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ),
+        search,
         const SizedBox(width: 15),
-        SizedBox(
-          width: 205,
-          child: _buildFilterButton(),
-        ),
+        SizedBox(width: 190, child: filter),
         const SizedBox(width: 15),
-        SizedBox(
-          width: 205,
-          child: _buildAddButton(),
-        ),
+        SizedBox(width: 190, child: add),
       ],
     );
   }
 
-  Widget _buildFilterButton() {
-    return SizedBox(
-      height: 48,
-      child: ElevatedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.filter_alt),
-        label: const Text('FILTRO'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAddButton() {
-    return SizedBox(
-      height: 48,
-      child: ElevatedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.add),
-        label: const Text('ADICIONAR'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: cardColor,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDesktopTable() {
+  Widget _buildMobile() {
     if (_filteredBooks.isEmpty) {
-      return _buildEmpty();
+      return _empty();
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.only(bottom: 10),
+      itemCount: _filteredBooks.length,
+      separatorBuilder: (_, __) =>
+          const SizedBox(height: 7),
+      itemBuilder: (_, index) {
+        final book = _filteredBooks[index];
+
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 9,
+          ),
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      book.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Lançamento: ${_date(book.publicationDate)}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 10,
+                      ),
+                    ),
+                    Text(
+                      'Quantidade: ${book.quantity}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 10,
+                      ),
+                    ),
+                    Text(
+                      'Editora: ${book.publisherName}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.edit,
+                color: Color(0xFFE0C98F),
+                size: 17,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDesktop() {
+    if (_filteredBooks.isEmpty) {
+      return _empty();
     }
 
     return Container(
-      width: double.infinity,
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -242,7 +301,8 @@ class _BooksPageState extends State<BooksPage> {
         scrollDirection: Axis.horizontal,
         child: DataTable(
           columnSpacing: 50,
-          headingRowColor: WidgetStateProperty.all(
+          headingRowColor:
+              WidgetStateProperty.all(
             const Color(0xFF5B2926),
           ),
           headingTextStyle: const TextStyle(
@@ -280,7 +340,6 @@ class _BooksPageState extends State<BooksPage> {
                     icon: const Icon(
                       Icons.edit,
                       color: Color(0xFFE0C98F),
-                      size: 19,
                     ),
                   ),
                 ),
@@ -292,108 +351,12 @@ class _BooksPageState extends State<BooksPage> {
     );
   }
 
-  Widget _buildMobileList() {
-    if (_filteredBooks.isEmpty) {
-      return _buildEmpty();
-    }
-
-    return ListView.separated(
-      itemCount: _filteredBooks.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (context, index) {
-        final book = _filteredBooks[index];
-
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      book.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    icon: const Icon(
-                      Icons.edit,
-                      color: Color(0xFFE0C98F),
-                      size: 19,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              _info('Autor', '—'),
-              _info(
-                'Lançamento',
-                _date(book.publicationDate),
-              ),
-              _info(
-                'Quantidade',
-                book.quantity.toString(),
-              ),
-              _info(
-                'Editora',
-                book.publisherName,
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _info(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 95,
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 13,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmpty() {
+  Widget _empty() {
     return const Center(
       child: Text(
         'Nenhum livro encontrado.',
         style: TextStyle(
           color: Colors.white,
-          fontSize: 16,
         ),
       ),
     );

@@ -19,18 +19,22 @@ class BookModel {
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
     return BookModel(
-      id: json['id'],
-      title: json['title'] ?? '',
-      publicationDate: json['publicationDate'],
-      genre: json['genre'] ?? '',
+      id: json['id'] as int,
+      title: json['title']?.toString() ?? '',
+      publicationDate: json['publicationDate']?.toString(),
+      genre: json['genre']?.toString() ?? '',
       numberPages: json['numberPages'] ?? 0,
       quantity: json['quantity'] ?? 0,
-      publisher: json['publisher'],
+      publisher: json['publisher'] is Map
+          ? Map<String, dynamic>.from(json['publisher'])
+          : null,
     );
   }
 
   String get publisherName {
-    if (publisher == null) return '—';
+    if (publisher == null) {
+      return '—';
+    }
 
     return publisher!['namePublisher']?.toString() ?? '—';
   }

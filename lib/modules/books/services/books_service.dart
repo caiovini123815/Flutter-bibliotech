@@ -11,6 +11,10 @@ class BooksService {
   Future<List<BookModel>> getBooks() async {
     final token = await _authService.getToken();
 
+    if (token == null) {
+      throw Exception('Usuário não autenticado.');
+    }
+
     final response = await http.get(
       Uri.parse('${AuthService.baseUrl}/books'),
       headers: {
@@ -25,12 +29,59 @@ class BooksService {
 
     final data = jsonDecode(response.body);
 
-    final List books = data['content'];
+    final List<dynamic> content = data['content'] ?? [];
 
-    return books
+    return content
         .map(
-          (book) => BookModel.fromJson(book),
+          (json) => BookModel.fromJson(
+            Map<String, dynamic>.from(json),
+          ),
         )
         .toList();
+  }
+
+  Future<void> createBook({
+    required String title,
+    required String isbn,
+    required String genre,
+    required int numberPages,
+    required int quantity,
+    required int publisherId,
+  }) async {
+    final token = await _authService.getToken();
+
+    if (token == null) {
+      throw Exception('Usuário não autenticado.');
+    }
+
+    final response = await http.post(
+      Uri.parse('${AuthService.baseUrl}/books'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'title': title,
+        'isbn': isbn,
+        'genre': genre,
+        'numberPages': numberPages,
+        'quantity': quantity,
+        'publisherId': publisherId,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      String message = 'Erro ao cadastrar livro.';
+
+      try {
+        final data = jsonDecode(response.body);
+
+        if (data is Map && data['message'] != null) {
+          message = data['message'].toString();
+        }
+      } catch (_) {}
+
+      throw Exception(message);
+    }
   }
 }
