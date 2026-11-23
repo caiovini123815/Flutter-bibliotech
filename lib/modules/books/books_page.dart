@@ -143,70 +143,75 @@ class _BooksPageState extends State<BooksPage> {
   }
 
   Widget _buildActions(bool mobile) {
-    final search = Expanded(
-      child: TextField(
-        controller: _searchController,
-        onChanged: (_) => setState(() {}),
-        decoration: const InputDecoration(
-          hintText: 'Procurar por nome do livro...',
-          prefixIcon: Icon(Icons.search),
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderSide: BorderSide.none,
-          ),
-        ),
+  final search = TextField(
+    controller: _searchController,
+    onChanged: (_) => setState(() {}),
+    decoration: const InputDecoration(
+      hintText: 'Procurar por nome do livro...',
+      prefixIcon: Icon(Icons.search),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderSide: BorderSide.none,
       ),
-    );
+    ),
+  );
 
-    final filter = ElevatedButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.filter_alt),
-      label: const Text('FILTRO'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        minimumSize: const Size(0, 44),
-      ),
-    );
+  final filter = ElevatedButton.icon(
+    onPressed: () {},
+    icon: const Icon(Icons.filter_alt),
+    label: const Text('FILTRO'),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
+      minimumSize: const Size(0, 44),
+    ),
+  );
 
-    final add = ElevatedButton.icon(
-      onPressed: _addBook,
-      icon: const Icon(Icons.add),
-      label: const Text('ADICIONAR'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: cardColor,
-        foregroundColor: Colors.white,
-        minimumSize: const Size(0, 44),
-      ),
-    );
+  final add = ElevatedButton.icon(
+    onPressed: _addBook,
+    icon: const Icon(Icons.add),
+    label: const Text('ADICIONAR'),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: cardColor,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(0, 44),
+    ),
+  );
 
-    if (mobile) {
-      return Column(
-        children: [
-          search,
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(child: filter),
-              const SizedBox(width: 8),
-              Expanded(child: add),
-            ],
-          ),
-        ],
-      );
-    }
-
-    return Row(
+  if (mobile) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         search,
-        const SizedBox(width: 15),
-        SizedBox(width: 190, child: filter),
-        const SizedBox(width: 15),
-        SizedBox(width: 190, child: add),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(child: filter),
+            const SizedBox(width: 8),
+            Expanded(child: add),
+          ],
+        ),
       ],
     );
   }
+
+  return Row(
+    children: [
+      Expanded(child: search),
+      const SizedBox(width: 15),
+      SizedBox(
+        width: 190,
+        child: filter,
+      ),
+      const SizedBox(width: 15),
+      SizedBox(
+        width: 190,
+        child: add,
+      ),
+    ],
+  );
+}
 
   Widget _buildMobile() {
     if (_filteredBooks.isEmpty) {

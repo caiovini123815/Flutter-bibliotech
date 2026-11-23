@@ -4,6 +4,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../dashboard/dashboard_page.dart';
 import '../books/books_page.dart';
+import '../publishers/publishers_page.dart';
+import '../rents/rents_page.dart';
+import '../user/user_page.dart';
+import '../settings/settings_page.dart';
 
 import '../../core/services/http/auth_service.dart';
 
@@ -242,6 +246,18 @@ class _MenuPageState extends State<MenuPage> {
   if (_selectedIndex == 2) {
     return const BooksPage();
   }
+   if (_selectedIndex == 3) {
+    return const RentsPage();
+  }
+  if (_selectedIndex == 4) {
+  return const PublishersPage();
+  }
+  if (_selectedIndex == 5) {
+  return const UsersPage();
+  }
+  if (_selectedIndex == 6) {
+  return const SettingsPage();
+  }
 
   return _buildPlaceholder(
     _menuItems[_selectedIndex]['title'] as String,
@@ -263,7 +279,7 @@ class _MenuPageState extends State<MenuPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'A tela Meu Perfil será implementada posteriormente.',
+          '',
         ),
       ),
     );
