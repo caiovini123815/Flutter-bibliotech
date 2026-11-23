@@ -65,9 +65,7 @@ class _LoginPageState extends State<LoginPage> {
 
       final bool isAdmin = result['isAdmin'] == true;
 
-      // A autenticação foi concluída.
-      // O AuthService já armazenou o token e os dados do usuário.
-
+      
       Navigator.pushReplacementNamed(
         context,
         '/menu',

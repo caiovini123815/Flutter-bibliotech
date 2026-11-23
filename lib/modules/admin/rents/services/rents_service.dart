@@ -1,25 +1,30 @@
+
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../../../core/services/http/auth_service.dart';
+import '../../../../core/services/http/auth_service.dart';
 import '../models/rent_model.dart';
 
 class RentsService {
-  Future<List<RentModel>> getRents() async {
+  Future<Map<String, String>> _headers() async {
     final token = await AuthService().getToken();
 
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  Future<List<RentModel>> getRents() async {
     final response = await http.get(
       Uri.parse('${AuthService.baseUrl}/rents'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: await _headers(),
     );
 
     if (response.statusCode != 200) {
       throw Exception(
-        'Erro ao carregar aluguéis: ${response.statusCode}',
+        'Erro ao carregar aluguéis: ${response.statusCode} - ${response.body}',
       );
     }
 
@@ -41,21 +46,17 @@ class RentsService {
     required int userId,
     required int bookId,
   }) async {
-    final token = await AuthService().getToken();
-
     final response = await http.post(
       Uri.parse('${AuthService.baseUrl}/rents'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: await _headers(),
       body: jsonEncode({
         'userId': userId,
         'bookId': bookId,
       }),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 201 &&
+        response.statusCode != 200) {
       String message =
           'Erro ao cadastrar aluguel: ${response.statusCode}';
 
@@ -72,14 +73,9 @@ class RentsService {
   }
 
   Future<void> returnRent(int rentId) async {
-    final token = await AuthService().getToken();
-
     final response = await http.patch(
       Uri.parse('${AuthService.baseUrl}/rents/$rentId/return'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: await _headers(),
     );
 
     if (response.statusCode != 200) {

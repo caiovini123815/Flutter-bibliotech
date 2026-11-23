@@ -31,10 +31,11 @@ class AuthService {
       throw Exception('Falha na autenticação.');
     }
 
-    final data = jsonDecode(response.body)
-        as Map<String, dynamic>;
+    final data =
+        jsonDecode(response.body) as Map<String, dynamic>;
 
     final token = data['token'] as String;
+    final id = data['id'];
 
     final parts = token.split('.');
 
@@ -59,7 +60,7 @@ class AuthService {
 
     await _storage.write(
       key: 'user_id',
-      value: data['id'].toString(),
+      value: id.toString(),
     );
 
     await _storage.write(
@@ -68,7 +69,7 @@ class AuthService {
     );
 
     return {
-      'id': data['id'],
+      'id': id,
       'token': token,
       'isAdmin': isAdmin,
     };
@@ -78,7 +79,21 @@ class AuthService {
     return await _storage.read(key: 'access_token');
   }
 
+  // Recupera o ID do usuário autenticado.
+  Future<int?> getUserId() async {
+    final id = await _storage.read(key: 'user_id');
+    return id == null ? null : int.tryParse(id);
+  }
+
+  // Verifica se o usuário é administrador.
+  Future<bool> getIsAdmin() async {
+    final value = await _storage.read(key: 'is_admin');
+    return value == 'true';
+  }
+
   Future<void> logout() async {
-    await _storage.deleteAll();
+    await _storage.delete(key: 'access_token');
+    await _storage.delete(key: 'user_id');
+    await _storage.delete(key: 'is_admin');
   }
 }

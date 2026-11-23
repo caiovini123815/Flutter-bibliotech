@@ -2,6 +2,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+
 import '../dashboard/dashboard_page.dart';
 import '../books/books_page.dart';
 import '../publishers/publishers_page.dart';
@@ -9,7 +10,7 @@ import '../rents/rents_page.dart';
 import '../user/user_page.dart';
 import '../settings/settings_page.dart';
 
-import '../../core/services/http/auth_service.dart';
+import '../../../core/services/http/auth_service.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -119,7 +120,6 @@ class _MenuPageState extends State<MenuPage> {
             'assets/image-bibliotech.png',
             fit: BoxFit.cover,
           ),
-
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -136,12 +136,10 @@ class _MenuPageState extends State<MenuPage> {
                     ),
                     child: Container(
                       width: double.infinity,
-
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 30,
                       ),
-
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(
                           177,
@@ -151,7 +149,6 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                         borderRadius: BorderRadius.circular(20),
                       ),
-
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -164,9 +161,7 @@ class _MenuPageState extends State<MenuPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
                           const SizedBox(height: 16),
-
                           const Text(
                             'O seu sistema moderno de gerenciamento de biblioteca.',
                             textAlign: TextAlign.center,
@@ -175,9 +170,7 @@ class _MenuPageState extends State<MenuPage> {
                               fontSize: 14,
                             ),
                           ),
-
                           const SizedBox(height: 40),
-
                           ElevatedButton(
                             onPressed: () {
                               setState(() {
@@ -188,8 +181,7 @@ class _MenuPageState extends State<MenuPage> {
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
                               elevation: 0,
-                              padding:
-                                  const EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 12,
                               ),
@@ -236,33 +228,34 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Widget _buildPage() {
-  if (_selectedIndex == 0) {
-    return _buildHome();
-  }
+    switch (_selectedIndex) {
+      case 0:
+        return _buildHome();
 
-  if (_selectedIndex == 1) {
-    return const DashboardPage();
-  }
-  if (_selectedIndex == 2) {
-    return const BooksPage();
-  }
-   if (_selectedIndex == 3) {
-    return const RentsPage();
-  }
-  if (_selectedIndex == 4) {
-  return const PublishersPage();
-  }
-  if (_selectedIndex == 5) {
-  return const UsersPage();
-  }
-  if (_selectedIndex == 6) {
-  return const SettingsPage();
-  }
+      case 1:
+        return const DashboardPage();
 
-  return _buildPlaceholder(
-    _menuItems[_selectedIndex]['title'] as String,
-  );
-}
+      case 2:
+        return const BooksPage();
+
+      case 3:
+        return const RentsPage();
+
+      case 4:
+        return const PublishersPage();
+
+      case 5:
+        return const UsersPage();
+
+      case 6:
+        return const SettingsPage();
+
+      default:
+        return _buildPlaceholder(
+          _menuItems[_selectedIndex]['title'] as String,
+        );
+    }
+  }
 
   Future<void> _logout() async {
     await AuthService().logout();
@@ -272,16 +265,6 @@ class _MenuPageState extends State<MenuPage> {
     Navigator.of(context).pushNamedAndRemoveUntil(
       '/',
       (route) => false,
-    );
-  }
-
-  void _showProfileMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          '',
-        ),
-      ),
     );
   }
 
@@ -295,7 +278,11 @@ class _MenuPageState extends State<MenuPage> {
       color: Colors.white,
       onSelected: (value) {
         if (value == 'profile') {
-          _showProfileMessage();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Tela de perfil em desenvolvimento.'),
+            ),
+          );
         } else if (value == 'logout') {
           _logout();
         }
@@ -370,7 +357,6 @@ class _MenuPageState extends State<MenuPage> {
         return Scaffold(
           key: _scaffoldKey,
           backgroundColor: const Color(0xFFC89F7A),
-
           appBar: AppBar(
             backgroundColor: primaryColor,
             foregroundColor: Colors.white,
@@ -400,7 +386,6 @@ class _MenuPageState extends State<MenuPage> {
               const SizedBox(width: 12),
             ],
           ),
-
           drawer: isWide
               ? null
               : Drawer(
@@ -410,7 +395,6 @@ class _MenuPageState extends State<MenuPage> {
                     child: _buildSidebar(isMobile: true),
                   ),
                 ),
-
           body: Row(
             children: [
               if (isWide) _buildSidebar(),

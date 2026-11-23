@@ -3,13 +3,16 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../../../core/services/http/auth_service.dart';
+import '../../../../core/services/http/auth_service.dart';
 import '../models/user_model.dart';
 
 class UsersService {
-  // Headers com autenticação
   Future<Map<String, String>> _headers() async {
     final token = await AuthService().getToken();
+
+    if (token == null) {
+      throw Exception('Usuário não autenticado.');
+    }
 
     return {
       'Authorization': 'Bearer $token',
@@ -17,7 +20,6 @@ class UsersService {
     };
   }
 
-  // Listar usuários
   Future<List<UserModel>> getUsers({
     int page = 0,
     int size = 100,
@@ -52,7 +54,6 @@ class UsersService {
         .toList();
   }
 
-  // Cadastrar usuário
   Future<UserModel> createUser({
     required String nameFull,
     required String email,
@@ -84,13 +85,10 @@ class UsersService {
     }
 
     return UserModel.fromJson(
-      Map<String, dynamic>.from(
-        jsonDecode(response.body),
-      ),
+      Map<String, dynamic>.from(jsonDecode(response.body)),
     );
   }
 
-  // Desativar usuário
   Future<UserModel> disableUser(int id) async {
     final response = await http.patch(
       Uri.parse('${AuthService.baseUrl}/users/$id/disable'),
@@ -104,13 +102,10 @@ class UsersService {
     }
 
     return UserModel.fromJson(
-      Map<String, dynamic>.from(
-        jsonDecode(response.body),
-      ),
+      Map<String, dynamic>.from(jsonDecode(response.body)),
     );
   }
 
-  // Ativar usuário
   Future<UserModel> enableUser(int id) async {
     final response = await http.patch(
       Uri.parse('${AuthService.baseUrl}/users/$id/enable'),
@@ -124,9 +119,7 @@ class UsersService {
     }
 
     return UserModel.fromJson(
-      Map<String, dynamic>.from(
-        jsonDecode(response.body),
-      ),
+      Map<String, dynamic>.from(jsonDecode(response.body)),
     );
   }
 }

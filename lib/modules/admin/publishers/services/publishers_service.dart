@@ -1,25 +1,30 @@
+
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../../../core/services/http/auth_service.dart';
+import '../../../../core/services/http/auth_service.dart';
 import '../models/publisher_model.dart';
 
 class PublishersService {
-  Future<List<PublisherModel>> getPublishers() async {
+  Future<Map<String, String>> _headers() async {
     final token = await AuthService().getToken();
 
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  Future<List<PublisherModel>> getPublishers() async {
     final response = await http.get(
       Uri.parse('${AuthService.baseUrl}/publishers'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: await _headers(),
     );
 
     if (response.statusCode != 200) {
       throw Exception(
-        'Erro ao carregar editoras: ${response.statusCode}',
+        'Erro ao carregar editoras: ${response.statusCode} - ${response.body}',
       );
     }
 
@@ -44,14 +49,9 @@ class PublishersService {
     required String phonePublisher,
     required String website,
   }) async {
-    final token = await AuthService().getToken();
-
     final response = await http.post(
       Uri.parse('${AuthService.baseUrl}/publishers'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: await _headers(),
       body: jsonEncode({
         'namePublisher': namePublisher,
         'cnpj': cnpj,
@@ -61,7 +61,8 @@ class PublishersService {
       }),
     );
 
-    if (response.statusCode != 201) {
+    if (response.statusCode != 201 &&
+        response.statusCode != 200) {
       String message =
           'Erro ao cadastrar editora: ${response.statusCode}';
 
