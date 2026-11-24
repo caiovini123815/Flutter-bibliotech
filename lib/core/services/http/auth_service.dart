@@ -79,13 +79,11 @@ class AuthService {
     return await _storage.read(key: 'access_token');
   }
 
-  // Recupera o ID do usuário autenticado.
   Future<int?> getUserId() async {
     final id = await _storage.read(key: 'user_id');
     return id == null ? null : int.tryParse(id);
   }
 
-  // Verifica se o usuário é administrador.
   Future<bool> getIsAdmin() async {
     final value = await _storage.read(key: 'is_admin');
     return value == 'true';

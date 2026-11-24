@@ -115,7 +115,9 @@ class _RentsPageState extends State<RentsPage> {
     }).toList();
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime? date) {
+    if (date == null) return '—';
+
     return '${date.day.toString().padLeft(2, '0')}/'
         '${date.month.toString().padLeft(2, '0')}/'
         '${date.year}';
@@ -197,78 +199,76 @@ class _RentsPageState extends State<RentsPage> {
     );
   }
 
-  
-Widget _buildActions(bool mobile) {
-  final search = TextField(
-    controller: _searchController,
-    onChanged: (_) => setState(() {}),
-    decoration: const InputDecoration(
-      hintText: 'Procurar por usuário ou livro...',
-      prefixIcon: Icon(Icons.search),
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderSide: BorderSide.none,
+  Widget _buildActions(bool mobile) {
+    final search = TextField(
+      controller: _searchController,
+      onChanged: (_) => setState(() {}),
+      decoration: const InputDecoration(
+        hintText: 'Procurar por usuário ou livro...',
+        prefixIcon: Icon(Icons.search),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderSide: BorderSide.none,
+        ),
       ),
-    ),
-  );
+    );
 
-  final filter = ElevatedButton.icon(
-    onPressed: () {},
-    icon: const Icon(Icons.filter_alt),
-    label: const Text('FILTRO'),
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black87,
-      minimumSize: const Size(0, 44),
-    ),
-  );
+    final filter = ElevatedButton.icon(
+      onPressed: () {},
+      icon: const Icon(Icons.filter_alt),
+      label: const Text('FILTRO'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        minimumSize: const Size(0, 44),
+      ),
+    );
 
-  final add = ElevatedButton.icon(
-    onPressed: _addRent,
-    icon: const Icon(Icons.add),
-    label: const Text('ADICIONAR'),
-    style: ElevatedButton.styleFrom(
-      backgroundColor: cardColor,
-      foregroundColor: Colors.white,
-      minimumSize: const Size(0, 44),
-    ),
-  );
+    final add = ElevatedButton.icon(
+      onPressed: _addRent,
+      icon: const Icon(Icons.add),
+      label: const Text('ADICIONAR'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: cardColor,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(0, 44),
+      ),
+    );
 
-  if (mobile) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    if (mobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          search,
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(child: filter),
+              const SizedBox(width: 8),
+              Expanded(child: add),
+            ],
+          ),
+        ],
+      );
+    }
+
+    return Row(
       children: [
-        search,
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(child: filter),
-            const SizedBox(width: 8),
-            Expanded(child: add),
-          ],
+        Expanded(child: search),
+        const SizedBox(width: 15),
+        SizedBox(
+          width: 190,
+          child: filter,
+        ),
+        const SizedBox(width: 15),
+        SizedBox(
+          width: 190,
+          child: add,
         ),
       ],
     );
   }
-
-  return Row(
-    children: [
-      Expanded(child: search),
-      const SizedBox(width: 15),
-      SizedBox(
-        width: 190,
-        child: filter,
-      ),
-      const SizedBox(width: 15),
-      SizedBox(
-        width: 190,
-        child: add,
-      ),
-    ],
-  );
-}
-
 
   Widget _buildMobile() {
     if (_filteredRents.isEmpty) {
@@ -330,12 +330,21 @@ Widget _buildActions(bool mobile) {
                     ),
 
                     Text(
-                      'Vencimento: ${_formatDate(rent.returnDate)}',
+                      'Vencimento: ${_formatDate(rent.returnPeriod)}',
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 10,
                       ),
                     ),
+
+                    if (rent.returnDate != null)
+                      Text(
+                        'Devolvido em: ${_formatDate(rent.returnDate)}',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -437,7 +446,7 @@ Widget _buildActions(bool mobile) {
                     Text(_formatDate(rent.rentDate)),
                   ),
                   DataCell(
-                    Text(_formatDate(rent.returnDate)),
+                    Text(_formatDate(rent.returnPeriod)),
                   ),
                   DataCell(
                     Text(

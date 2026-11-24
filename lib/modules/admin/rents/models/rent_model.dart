@@ -1,3 +1,4 @@
+
 class RentModel {
   final int id;
   final int userId;
@@ -6,7 +7,7 @@ class RentModel {
   final String bookTitle;
   final DateTime rentDate;
   final DateTime? returnPeriod;
-  final DateTime returnDate;
+  final DateTime? returnDate;
   final String status;
 
   RentModel({
@@ -31,16 +32,18 @@ class RentModel {
         : <String, dynamic>{};
 
     return RentModel(
-      id: json['id'],
-      userId: user['id'],
+      id: (json['id'] as num).toInt(),
+      userId: (user['id'] as num).toInt(),
       userName: user['nameFull'] ?? '—',
-      bookId: book['id'],
+      bookId: (book['id'] as num).toInt(),
       bookTitle: book['title'] ?? '—',
       rentDate: DateTime.parse(json['rentDate']),
       returnPeriod: json['returnPeriod'] != null
           ? DateTime.parse(json['returnPeriod'])
           : null,
-      returnDate: DateTime.parse(json['returnDate']),
+      returnDate: json['returnDate'] != null
+          ? DateTime.parse(json['returnDate'])
+          : null,
       status: json['status'] ?? '—',
     );
   }

@@ -65,17 +65,29 @@ class _LoginPageState extends State<LoginPage> {
 
       final bool isAdmin = result['isAdmin'] == true;
 
-      
-      Navigator.pushReplacementNamed(
-        context,
-        '/menu',
-      );
+      debugPrint('Login realizado com sucesso.');
+      debugPrint('ID recebido: ${result['id']}');
+      debugPrint('Tipo de conta: ${isAdmin ? 'ADMIN' : 'USER'}');
 
-    } catch (e) {
+      if (isAdmin) {
+        Navigator.pushReplacementNamed(
+          context,
+          '/admin',
+        );
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          '/user',
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint('ERRO NO LOGIN: $e');
+      debugPrint('STACK TRACE: $stackTrace');
+
       if (!mounted) return;
 
       _showMessage(
-        'Não foi possível entrar. Verifique seu e-mail, senha e conexão com o servidor.',
+        'Erro ao entrar: $e',
       );
     } finally {
       if (mounted) {

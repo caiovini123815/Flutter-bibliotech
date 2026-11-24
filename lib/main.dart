@@ -2,9 +2,10 @@
 import 'package:flutter/material.dart';
 
 import 'modules/login/login_page.dart';
+import 'modules/admin/menu/menu_page.dart';
+import 'modules/users/users_dashboard_page.dart';
 import 'modules/forgotpassword/forgot_password_page.dart';
 import 'modules/register/register_page.dart';
-import 'modules/menu/menu_page.dart';
 
 void main() {
   runApp(const BibliotecaApp());
@@ -18,12 +19,19 @@ class BibliotecaApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Bibliotech',
-
-      home: const LoginPage(),
+      initialRoute: '/login',
 
       routes: {
-        '/menu': (context) => const MenuPage(),
+        '/login': (context) => const LoginPage(),
+
+        '/admin': (context) => const MenuPage(),
+
+        '/user': (context) => const UserDashboardPage(),
+
+        '/users': (context) => const UserDashboardPage(),
+
         '/forgotpassword': (context) => const ForgotPasswordPage(),
+
         '/register': (context) => const RegisterPage(),
       },
     );

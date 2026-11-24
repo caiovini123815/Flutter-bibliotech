@@ -257,13 +257,14 @@ class _MenuPageState extends State<MenuPage> {
     }
   }
 
+  // MÉTODO DE LOGOUT ALTERADO
   Future<void> _logout() async {
     await AuthService().logout();
 
     if (!mounted) return;
 
     Navigator.of(context).pushNamedAndRemoveUntil(
-      '/',
+      '/login',
       (route) => false,
     );
   }
